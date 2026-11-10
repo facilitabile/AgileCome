@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agile come…</title>
+<meta name="theme-color" content="#20263A">
+<meta name="description" content="Il mazzo di carte Agile come… di Facilitabile, sul tuo telefono.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Montserrat:wght@600;700;800&family=Noto+Serif:wght@400;500&family=Open+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: app a una colonna per telefono, barra di navigazione fissa in basso, carta al centro della scena */
+:root{
+  --bg:#F7F3EA; --surface:#FFFFFF; --ink:#20263A; --muted:#5A6072; --line:#E2DED3;
+  --lime:#7AF000; --lime-soft:#EEF9DC; --navy:#20263A; --cream:#FBF0DC;
+  --pt:#D9762B; --vm:#2F6DB5; --pr:#3C9A5F; --pv:#7A4BA3;
+  --f-ui:'Open Sans',system-ui,sans-serif; --f-head:'Montserrat','Open Sans',sans-serif;
+  --f-card:'Barlow Condensed','Arial Narrow',sans-serif; --f-serif:'Noto Serif',Georgia,serif;
+  --shadow:0 10px 30px rgba(32,38,58,.18);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#151A28;--surface:#1F2536;--ink:#EEF0F5;--muted:#A9AFC0;--line:#30374B;--lime-soft:#24311A;--shadow:0 10px 30px rgba(0,0,0,.45);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151A28;--surface:#1F2536;--ink:#EEF0F5;--muted:#A9AFC0;--line:#30374B;--lime-soft:#24311A;--shadow:0 10px 30px rgba(0,0,0,.45);color-scheme:dark}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.app{max-width:520px;margin:0 auto;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px calc(96px + env(safe-area-inset-bottom,0px))}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:4px 14px}
+.brand{font-family:var(--f-head);font-weight:800;font-size:20px;letter-spacing:-.01em}
+.brand span{background:var(--navy);color:var(--lime);padding:2px 8px;border-radius:6px;margin-right:6px;font-size:13px;letter-spacing:.06em}
+.view{display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--f-head);font-weight:800;font-size:26px;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--f-head);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0;color:var(--muted)}
+p{margin:0}
+.lead{font-size:16px;color:var(--muted)}
+/* segmented choices */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;min-height:44px}
+.opt b{font-family:var(--f-head);font-size:15px}
+.opt small{color:var(--muted);font-size:12.5px;line-height:1.35}
+.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;min-height:40px;font-weight:600;font-size:13.5px}
+.chip .dot{width:10px;height:10px;border-radius:50%}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 22px;border-radius:14px;border:0;font-family:var(--f-head);font-weight:800;font-size:16px;background:var(--lime);color:#20263A;width:100%}
+.btn.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+.btn.small{min-height:44px;font-size:14px;width:auto;padding:0 16px}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+/* stage */
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+.stepper{display:flex;gap:6px;justify-content:center}
+.stepper i{width:28px;height:5px;border-radius:3px;background:var(--line)}
+.stepper i.on{background:var(--ink)}
+.cardwrap{width:min(100%,340px);aspect-ratio:2/3;perspective:1200px}
+.cardwrap.sfida{aspect-ratio:5/7}
+.flip{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.flip.shown{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+.face.front{transform:rotateY(180deg)}
+.back{background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:6px solid var(--navy);outline:2px solid var(--lime);outline-offset:-14px}
+.back .t{font-family:var(--f-head);font-weight:800;color:var(--lime);font-size:30px}
+.back .s{font-family:var(--f-head);font-weight:700;color:#FFFFFF;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+.back .bars{display:flex;gap:6px}.back .bars i{width:22px;height:5px;border-radius:3px}
+.face img{width:100%;height:100%;object-fit:cover;display:block}
+@media (prefers-reduced-motion: reduce){.flip{transition:none}}
+/* sfida card */
+.sf{height:100%;display:flex;flex-direction:column;padding:22px 20px 16px;gap:12px;background:var(--cream);color:#20263A}
+.sf .pill{display:flex;align-items:center;gap:8px;border-radius:8px;padding:7px 10px;font-family:var(--f-head);font-weight:700;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase}
+.sf .pill svg{flex:none}
+.sf .ty{font-family:var(--f-card);font-weight:800;font-size:clamp(28px,9vw,42px);line-height:1;letter-spacing:.01em;padding-bottom:8px;border-bottom:2px solid currentColor}
+.sf .tx{font-family:var(--f-serif);font-size:19px;line-height:1.4;flex:1;display:flex;align-items:center}
+.sf .cd{display:flex;align-items:center;gap:8px;font-family:var(--f-head);font-weight:700;font-size:12px;letter-spacing:.08em}
+.sf .cd i{width:18px;height:3px;border-radius:2px}
+.sf .ft{display:flex;justify-content:space-between;border-top:1.5px solid currentColor;padding-top:8px;font-family:var(--f-head);font-weight:700;font-size:11px}
+.note{background:var(--lime-soft);border-radius:14px;padding:14px 16px;font-size:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+label{font-family:var(--f-head);font-weight:700;font-size:13px}
+textarea,input[type=date]{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px;font:inherit;background:var(--bg);color:var(--ink)}
+textarea{min-height:96px;resize:vertical}
+/* mazzo grid */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.thumb{border:0;padding:0;background:none;border-radius:10px;overflow:hidden;box-shadow:0 3px 10px rgba(32,38,58,.15);aspect-ratio:2/3}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.item .code{font-family:var(--f-head);font-weight:800;font-size:12px;min-width:48px;padding-top:2px}
+.item p{font-size:14px}
+/* overlay */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(10,12,20,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:calc(20px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.overlay .cardwrap{width:min(100%,420px,calc((100vh - 140px)*2/3))}
+.overlay .cardwrap.sfida{width:min(100%,460px,calc((100vh - 140px)*5/7))}
+.overlay .btn{max-width:420px}
+/* ce l'ho */
+.abil{display:flex;flex-wrap:wrap;gap:8px}
+.ab{border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;min-height:44px;font-family:var(--f-card);font-weight:700;font-size:17px;letter-spacing:.02em;display:inline-flex;align-items:center;gap:8px}
+.ab .dot{width:9px;height:9px;border-radius:50%}
+.ab[data-s="ho"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ab[data-s="manca"]{border-style:dashed;border-color:var(--ink)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cols ol{margin:6px 0 0;padding-left:20px;font-weight:600}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+/* diary */
+.entry{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.entry .meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);font-family:var(--f-head);font-weight:700}
+.entry.done{opacity:.6}
+.empty{color:var(--muted);text-align:center;padding:24px 8px}
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.tabs .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;min-height:52px;text-decoration:none;color:var(--muted);font-size:11px;font-weight:600;border-radius:10px}
+nav.tabs a[aria-current="page"]{color:var(--ink)}
+nav.tabs a[aria-current="page"] svg{stroke:var(--ink)}
+nav.tabs a[aria-current="page"] .bar{background:var(--lime)}
+nav.tabs .bar{width:22px;height:4px;border-radius:2px;background:transparent;margin-bottom:2px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:60;font-size:14px}
+.rules ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+  <header class="top">
+    <div class="brand"><span>F</span>Agile come…</div>
+  </header>
+
+  <!-- GIOCA -->
+  <section class="view" id="v-gioca" hidden>
+    <div id="setup" class="view">
+      <h1>Pesca una carta, prova un’abilità</h1>
+      <p class="lead">Un personaggio ti presta la sua abilità. Una sfida ti chiede di usarla.</p>
+      <h2>Come giochi oggi</h2>
+      <div class="seg" role="group" aria-label="Tipo di sfida">
+        <button class="opt" data-mode="E" aria-pressed="true" type="button"><b>Esplorazione</b><small>Scopri l’agilità. Parli in prima persona e provi qualcosa nei prossimi giorni.</small></button>
+        <button class="opt" data-mode="V" aria-pressed="false" type="button"><b>Verifica</b><small>Retrospettiva di team. Guardate l’ultimo periodo e scegliete un’azione.</small></button>
+      </div>
+      <h2>Su quale ambito</h2>
+      <div class="chips" id="ambitChips" role="group" aria-label="Ambito"></div>
+      <button class="btn" id="startBtn" type="button">Pesca un personaggio</button>
+    </div>
+
+    <div id="play" class="view" hidden>
+      <div class="stepper" aria-hidden="true"><i id="st1"></i><i id="st2"></i><i id="st3"></i></div>
+      <div class="stage" id="stage"></div>
+      <div id="controls" class="view"></div>
+    </div>
+  </section>
+
+  <!-- MAZZO -->
+  <section class="view" id="v-mazzo" hidden>
+    <h1>Il mazzo</h1>
+    <div class="seg" role="group" aria-label="Famiglia di carte">
+      <button class="opt" data-fam="P" aria-pressed="true" type="button"><b>Personaggi</b><small>30 carte</small></button>
+      <button class="opt" data-fam="S" aria-pressed="false" type="button"><b>Sfide</b><small>40 sfide e 4 jolly</small></button>
+    </div>
+    <div class="chips" id="deckChips" role="group" aria-label="Filtro ambito"></div>
+    <div id="deckSfType" class="chips" role="group" aria-label="Tipo di sfida" hidden>
+      <button class="chip" data-t="E" aria-pressed="true" type="button">Esplorazione</button>
+      <button class="chip" data-t="V" aria-pressed="false" type="button">Verifica</button>
+    </div>
+    <div id="deck"></div>
+  </section>
+
+  <!-- CE L'HO -->
+  <section class="view" id="v-celho" hidden>
+    <h1>Ce l’ho, mi manca</h1>
+    <p class="lead">Tocca un’abilità una volta se senti di averla, due volte se ti manca, tre per toglierla. Al massimo cinque per gruppo, nell’ordine in cui le scegli.</p>
+    <div class="legend"><span>■ ce l’ho</span><span>▢ mi manca</span></div>
+    <div class="abil" id="abil"></div>
+    <div class="cols">
+      <div class="panel"><label>Ce l’ho</label><ol id="listHo"></ol></div>
+      <div class="panel"><label>Mi manca</label><ol id="listManca"></ol></div>
+    </div>
+    <div class="note">Poi trova chi ha scelto la stessa abilità nell’altro gruppo: chi ce l’ha racconta come la vive, chi la vorrebbe racconta perché. Poi vi scambiate i ruoli.</div>
+    <button class="btn ghost" id="resetAbil" type="button">Ricomincia da capo</button>
+  </section>
+
+  <!-- DIARIO -->
+  <section class="view" id="v-diario" hidden>
+    <h1>Il mio diario</h1>
+    <p class="lead">Le sfide che hai scelto di provare. Restano solo su questo telefono.</p>
+    <div id="diary" class="view"></div>
+  </section>
+
+  <!-- REGOLE -->
+  <section class="view rules" id="v-regole" hidden>
+    <h1>Come si gioca</h1>
+    <div class="panel">
+      <h2>Il gioco base</h2>
+      <ol>
+        <li>Scegli Esplorazione o Verifica, e l’ambito.</li>
+        <li>Pesca un personaggio e leggi la sua abilità ad alta voce.</li>
+        <li>Pesca una sfida dello stesso colore e affrontala usando l’abilità della tua carta come lente.</li>
+        <li>Condividi con il gruppo e chiudi dicendo che cosa farai, e quando.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h2>Esplorazione o Verifica</h2>
+      <p><b>Esplorazione</b> è per chi si avvicina all’agilità: si parla al “tu” e si prova qualcosa nei giorni successivi.</p>
+      <p><b>Verifica</b> è per i team in retrospettiva: si parla al “noi”, si guarda l’ultimo periodo e si chiude con un’azione di team.</p>
+    </div>
+    <div class="panel">
+      <h2>I quattro ambiti</h2>
+      <div class="list" id="ambitList"></div>
+    </div>
+    <div class="panel">
+      <h2>In gruppo</h2>
+      <p>Ogni persona gioca dal proprio telefono. Quando vuoi far vedere la tua carta, tocca <b>Mostra a tutti</b>: la carta si apre a schermo intero.</p>
+    </div>
+    <p style="text-align:center;font-family:var(--f-head);font-weight:800">Non è facile, ma è facilitabile!</p>
+  </section>
+</div>
+
+<nav class="tabs" aria-label="Sezioni">
+  <div class="in">
+    <a href="#gioca" data-v="gioca"><span class="bar"></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 9l4 3-4 3z"/></svg>Gioca</a>
+    <a href="#mazzo" data-v="mazzo"><span class="bar"></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="11" height="15" rx="2"/><path d="M17 5l3 1-3 14"/></svg>Mazzo</a>
+    <a href="#celho" data-v="celho"><span class="bar"></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h7M4 12h7M4 17h7"/><path d="M15 7l2 2 3-4"/><path d="M15 15l5 4M20 15l-5 4"/></svg>Ce l’ho</a>
+    <a href="#diario" data-v="diario"><span class="bar"></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 9h6M9 13h6"/></svg>Diario</a>
+    <a href="#regole" data-v="regole"><span class="bar"></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg>Regole</a>
+  </div>
+</nav>
+
+<script>
+(function(){
+const AMB={
+  PT:{name:'Persone e team',c:'var(--pt)',hex:'#D9762B',ink:'#20263A',icon:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.3 5 2.6 5 5.8"/>',what:'Relazioni, fiducia, collaborazione, auto-organizzazione'},
+  VM:{name:'Valori e mindset',c:'var(--vm)',hex:'#2F6DB5',ink:'#FBF0DC',icon:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',what:'Valori Scrum e atteggiamenti personali'},
+  PR:{name:'Processo',c:'var(--pr)',hex:'#3C9A5F',ink:'#20263A',icon:'<path d="M20 12a8 8 0 0 1-14 5.3"/><path d="M4 12a8 8 0 0 1 14-5.3"/><path d="M18 3v4h-4"/><path d="M6 21v-4h4"/>',what:'Come si lavora: iterare, ispezionare, adattarsi, ritmo e flusso'},
+  PV:{name:'Prodotto e valore',c:'var(--pv)',hex:'#7A4BA3',ink:'#FBF0DC',icon:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20"/><path d="M12 21L8 9l4-6 4 6z"/>',what:'Per chi si lavora: priorità, ascolto del cliente, semplicità, sperimentazione'}
+};
+const P=[
+ [1,'Mahatma Gandhi','Collaborazione','','PT'],[2,'Ernest Shackleton','Fiducia','','PT'],[3,'Nelson Mandela','Rispetto','','PT'],[4,'Madre Teresa di Calcutta','Empatia','','PT'],[5,'Martin Luther King Jr.','Motivazione','','PT'],[6,'Katherine Johnson','Squadra','Lavoro di squadra','PT'],[7,'Confucio','Mentoring','','PT'],[8,'Maria Montessori','Autonomia','Auto-organizzazione','PT'],
+ [9,'Amelia Earhart','Coraggio','','VM'],[10,'Giovanna d’Arco','Impegno','Commitment','VM'],[11,'Marie Curie','Focus','','VM'],[12,'Winston Churchill','Apertura','Comunicazione aperta','VM'],[13,'George Washington','Responsabilità','','VM'],[14,'Caterina la Grande','Decisione','Sicurezza nelle decisioni','VM'],[15,'Albert Einstein','Apprendimento','Apprendimento continuo','VM'],
+ [16,'Thomas Edison','Iterazione','','PR'],[17,'Charles Darwin','Adattamento','Adattamento al cambiamento','PR'],[18,'Socrate','Feedback','Feedback costruttivo','PR'],[19,'Abramo Lincoln','Trasparenza','','PR'],[20,'Galileo Galilei','Ispezione','','PR'],[21,'Benjamin Franklin','Timeboxing','','PR'],[22,'Adriano Olivetti','Ritmo','Ritmo sostenibile','PR'],[23,'Henry Ford','Flusso','','PR'],
+ [24,'Cleopatra','Priorità','Gestione delle priorità','PV'],[25,'Pellegrino Artusi','Ascolto','Collaborazione con il cliente','PV'],[26,'Giulio Cesare','Strategia','Pensiero strategico','PV'],[27,'Leonardo da Vinci','Semplicità','','PV'],[28,'Grace Hopper','Esperimento','Sperimentazione','PV'],[29,'Frida Kahlo','Creatività','Pensiero creativo','PV'],[30,'Sherlock Holmes','Indagine','Problem solving','PV']
+].map(([n,name,abil,sub,a])=>({n,name,abil,sub,a,img:'img/'+String(n).padStart(2,'0')+'.jpg'}));
+const S={
+ PT:{E:['Per un giorno osserva dove l’abilità della tua carta compare, o manca, nelle relazioni con chi lavora con te. Raccontalo a una persona.','Chiedi a una persona con cui lavori un esempio di quando ha messo in pratica l’abilità della tua carta. Ascolta senza interrompere.','Scegli una riunione della prossima settimana e porta l’abilità della tua carta in un gesto concreto. Annota com’è andata.','Pensa a una persona che incarna l’abilità della tua carta meglio di te. Diglielo, con un esempio.','Scegli un comportamento del personaggio della tua carta e provalo nel tuo gruppo di lavoro per tre giorni.'],
+     V:['Chi, nel team, ha mostrato questa abilità nell’ultimo periodo? Diteglielo, con un esempio concreto.','In quale momento dell’ultimo periodo questa abilità è mancata nei rapporti tra di noi? Che cosa l’ha resa difficile?','Ogni persona dà un voto da 1 a 5 a quanto il team ha vissuto questa abilità. Confrontate i voti e parlate delle differenze.','Se il personaggio della carta fosse entrato nel team nell’ultimo periodo, che cosa avrebbe notato? Che cosa ci consiglierebbe?','Quale piccolo accordo tra di noi ci aiuterebbe a vivere di più questa abilità? Sceglietene uno e provatelo fino alla prossima verifica.']},
+ VM:{E:['Ripensa a una decisione recente. Che cosa avresti fatto di diverso con l’abilità della tua carta? Scrivilo in tre righe.','Per una settimana, a fine giornata, annota una situazione in cui hai messo in pratica l’abilità della tua carta, anche piccola.','Individua una tua abitudine che ostacola l’abilità della tua carta. Prova a sospenderla per due giorni.','Racconta a una persona di fiducia perché l’abilità della tua carta è importante per te, o perché ti costa fatica.','Scrivi una frase che il personaggio della tua carta potrebbe dirti oggi. Tienila in vista per una settimana.'],
+     V:['Quale nostra scelta dell’ultimo periodo racconta bene questa abilità? E quale la contraddice?','In quale situazione avremmo avuto bisogno di questa abilità e non l’abbiamo trovata? Che cosa ce l’ha impedito?','Questa abilità è tra i nostri valori dichiarati o la diamo per scontata? Descriviamo come si vede nel lavoro di tutti i giorni.','Ogni persona racconta un momento in cui ha sentito il team vicino, o lontano, da questa abilità.','Quale comportamento concreto mostrerebbe, a chi ci osserva, che teniamo a questa abilità? Pratichiamolo fino alla prossima verifica.']},
+ PR:{E:['Scegli un’attività che ripeti ogni settimana. Per una volta, falla mettendo in pratica l’abilità della tua carta, e annota che cosa cambia.','Descrivi in cinque passaggi un tuo lavoro ricorrente. In quale passaggio servirebbe di più l’abilità della tua carta?','Prova per tre giorni un piccolo cambiamento nel tuo modo di lavorare, ispirato al personaggio della tua carta. Poi decidi se tenerlo.','Individua un passaggio del tuo lavoro che si inceppa spesso. Come lo affronterebbe il personaggio della tua carta? Prova a farlo.','Chiedi a chi riceve il tuo lavoro che cosa migliorerebbe. Collega la risposta all’abilità della tua carta.'],
+     V:['In quale momento dell’ultimo periodo il nostro modo di lavorare avrebbe avuto bisogno di questa abilità? Che cosa proviamo a cambiare da domani?','Ricostruiamo l’ultimo periodo su una linea del tempo e segniamo dove questa abilità ci ha aiutato e dove è mancata.','Quale regola o abitudine del nostro processo va contro questa abilità? La teniamo, la cambiamo o la togliamo?','Se dovessimo spiegare il nostro modo di lavorare al personaggio della carta, che cosa racconteremmo con orgoglio? E che cosa con un po’ di imbarazzo?','Scegliamo un piccolo esperimento sul nostro processo, legato a questa abilità, e stabiliamo come capiremo se ha funzionato.']},
+ PV:{E:['Pensa a una persona che usa ciò che produci. Che cosa cambierebbe per lei se mettessi in pratica l’abilità della tua carta?','Fai una sola domanda, ispirata al personaggio della tua carta, a una persona che usa il tuo lavoro. Annota la risposta.','Scegli un lavoro in corso e individua la parte che porta più valore. Dedicale i prossimi due giorni.','Individua una cosa che stai facendo e che nessuno ti ha chiesto davvero. Come la valuterebbe il personaggio della tua carta?','Descrivi in una frase per chi lavori e quale problema risolvi. Poi rileggila con gli occhi del personaggio della tua carta.'],
+     V:['Che cosa abbiamo consegnato nell’ultimo periodo che ha portato valore vero a qualcuno? Come lo sappiamo?','In quale scelta su che cosa fare, o non fare, questa abilità ci avrebbe aiutato?','Che cosa abbiamo fatto nell’ultimo periodo che, ripensandoci, potevamo evitare? Che cosa ci suggerisce questa abilità?','Che cosa direbbero di noi le persone per cui lavoriamo, se potessero partecipare a questa verifica?','Quale decisione sul prodotto prendiamo, ispirata da questa abilità, prima della prossima verifica?']},
+ J:{E:['Inventa tu una sfida per mettere in pratica l’abilità della tua carta entro una settimana, e dichiarala a una persona.','Scambia la tua carta personaggio con quella di un’altra persona. Ciascuna racconta come l’abilità ricevuta si collega al proprio lavoro.'],
+    V:['Ogni persona pesca un personaggio a caso: quale sua abilità sarebbe servita di più al team nell’ultimo periodo?','Riprendiamo le azioni decise nella verifica precedente: quale abilità ci ha aiutato a portarle a termine, e quale è mancata?']}
+};
+const SF=[]; for(const a of ['PT','VM','PR','PV','J']) for(const t of ['E','V']) S[a][t].forEach((tx,i)=>SF.push({a,t,i:i+1,tx,code:(a==='J'?'J':a+'-'+t)+(i+1)}));
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem('agilecome.'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('agilecome.'+k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const icon=(a,col)=>`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${AMB[a].icon}</svg>`;
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+function toast(t){const d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+
+function backHTML(label){return `<div class="face back"><div class="t">Agile come…</div><div class="s">${label}</div><div class="bars"><i style="background:var(--pt)"></i><i style="background:var(--vm)"></i><i style="background:var(--pr)"></i><i style="background:var(--pv)"></i></div></div>`}
+function sfidaHTML(s){
+  const jolly=s.a==='J', verifica=s.t==='V';
+  let bg='var(--cream)',fg='#20263A',pillBg,pillFg,pill,codeCol;
+  if(jolly){bg='#20263A';fg='#FBF0DC';pillBg='#FBF0DC';pillFg='#20263A';codeCol='#7AF000';pill=`<span>Jolly</span><span style="margin-left:auto;display:flex;gap:4px"><i style="width:9px;height:9px;background:var(--pt)"></i><i style="width:9px;height:9px;background:var(--vm)"></i><i style="width:9px;height:9px;background:var(--pr)"></i><i style="width:9px;height:9px;background:var(--pv)"></i></span>`}
+  else{const A=AMB[s.a];
+    if(verifica){bg=A.hex;fg=A.ink;pillBg='#FBF0DC';pillFg='#20263A';codeCol=fg}else{pillBg=A.hex;pillFg=A.ink;codeCol=A.hex}
+    pill=icon(s.a,pillFg)+`<span>${A.name}</span>`}
+  return `<div class="sf" style="background:${bg};color:${fg}" role="img" aria-label="Sfida ${s.code}: ${esc(s.tx)}">
+    <div class="pill" style="background:${pillBg};color:${pillFg}">${pill}</div>
+    <div class="ty">${verifica?'VERIFICA':'ESPLORAZIONE'}</div>
+    <div class="tx"><p>${esc(s.tx)}</p></div>
+    <div class="cd"><i style="background:${codeCol}"></i>${s.code}</div>
+    <div class="ft"><span>Agile come…</span><span>FACILITABILE</span></div></div>`}
+function personaggioFace(p){return `<div class="face front"><img src="${p.img}" alt="Carta ${p.n}: ${esc(p.abil)}, ${esc(p.name)}"></div>`}
+
+/* ---------- GIOCA ---------- */
+const g={mode:store.get('mode','E'),amb:store.get('amb','ALL'),p:null,s:null,step:0};
+function renderSetup(){
+  $$('#setup .opt').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===g.mode));
+  $('#ambitChips').innerHTML=[['ALL','Tutti','var(--ink)'],...Object.entries(AMB).map(([k,v])=>[k,v.name,v.c])].map(([k,n,c])=>`<button class="chip" type="button" data-a="${k}" aria-pressed="${g.amb===k}"><span class="dot" style="background:${c}"></span>${n}</button>`).join('');
+}
+$('#setup').addEventListener('click',e=>{
+  const o=e.target.closest('.opt'); if(o){g.mode=o.dataset.mode;store.set('mode',g.mode);renderSetup()}
+  const c=e.target.closest('.chip'); if(c){g.amb=c.dataset.a;store.set('amb',g.amb);renderSetup()}
+});
+$('#startBtn').addEventListener('click',()=>{$('#setup').hidden=true;$('#play').hidden=false;drawPersonaggio()});
+function setStep(n){g.step=n;['#st1','#st2','#st3'].forEach((s,i)=>$(s).classList.toggle('on',i<n))}
+function flipIn(wrapClass,back,front){
+  $('#stage').innerHTML=`<div class="cardwrap ${wrapClass}"><div class="flip">${back}${front}</div></div>`;
+  const f=$('#stage .flip'); requestAnimationFrame(()=>requestAnimationFrame(()=>f.classList.add('shown')));
+}
+function drawPersonaggio(){
+  const pool=P.filter(p=>g.amb==='ALL'||p.a===g.amb).filter(p=>!g.p||p.n!==g.p.n||P.length===1);
+  g.p=pick(pool); g.s=null; setStep(1);
+  flipIn('',backHTML('Personaggio'),personaggioFace(g.p));
+  $('#controls').innerHTML=`<p class="lead" style="text-align:center">La tua abilità: <b style="color:var(--ink)">${esc(g.p.abil)}</b>${g.p.sub?' · '+esc(g.p.sub):''}</p>
+    <button class="btn" id="toSfida" type="button">Pesca una sfida ${g.mode==='E'?'Esplorazione':'Verifica'}</button>
+    <div class="row"><button class="btn ghost small" id="reP" type="button">Ripesca</button><button class="btn ghost small" id="showP" type="button">Mostra a tutti</button></div>
+    <button class="btn ghost small" id="back1" type="button" style="width:100%">Cambia modalità</button>`;
+  $('#toSfida').onclick=drawSfida; $('#reP').onclick=drawPersonaggio; $('#showP').onclick=()=>showBig('',personaggioFace(g.p).replace('face front','face'));
+  $('#back1').onclick=()=>{$('#play').hidden=true;$('#setup').hidden=false;renderSetup()};
+}
+function drawSfida(){
+  const pool=SF.filter(s=>s.t===g.mode&&(s.a===g.p.a||s.a==='J')).filter(s=>!g.s||s.code!==g.s.code);
+  g.s=pick(pool); setStep(2);
+  flipIn('sfida',backHTML(g.mode==='E'?'Esplorazione':'Verifica'),`<div class="face front">${sfidaHTML(g.s)}</div>`);
+  $('#controls').innerHTML=`<p class="lead" style="text-align:center">Affrontala con l’abilità <b style="color:var(--ink)">${esc(g.p.abil)}</b> di ${esc(g.p.name)}.</p>
+    <button class="btn" id="toImp" type="button">${g.mode==='E'?'Accetto la sfida':'Fissa l’azione'}</button>
+    <div class="row"><button class="btn ghost small" id="reS" type="button">Un’altra sfida</button><button class="btn ghost small" id="showS" type="button">Mostra a tutti</button></div>
+    <button class="btn ghost small" id="seeP" type="button" style="width:100%">Rivedi il personaggio</button>`;
+  $('#toImp').onclick=impegno; $('#reS').onclick=drawSfida; $('#showS').onclick=()=>showBig('sfida',`<div class="face">${sfidaHTML(g.s)}</div>`);
+  $('#seeP').onclick=()=>showBig('',personaggioFace(g.p).replace('face front','face'));
+}
+function impegno(){
+  setStep(3);
+  $('#stage').innerHTML='';
+  const today=new Date(); today.setDate(today.getDate()+7); const d=today.toISOString().slice(0,10);
+  $('#controls').innerHTML=`<div class="panel">
+      <div class="item" style="border:0;padding:0"><span class="code">${g.s.code}</span><p>${esc(g.s.tx)}</p></div>
+      <label for="impText">${g.mode==='E'?'Che cosa farai, concretamente?':'Quale azione o accordo scegliete?'}</label>
+      <textarea id="impText" placeholder="${g.mode==='E'?'Per esempio: giovedì, nella riunione del mattino, chiedo un parere a chi parla di meno.':'Per esempio: per due settimane chiudiamo ogni riunione con un giro di feedback di un minuto.'}"></textarea>
+      <label for="impDate">Entro quando</label>
+      <input type="date" id="impDate" value="${d}">
+    </div>
+    <button class="btn" id="saveImp" type="button">Salva nel diario</button>
+    <button class="btn ghost small" id="again" type="button" style="width:100%">Nuova partita</button>`;
+  $('#saveImp').onclick=()=>{
+    const txt=$('#impText').value.trim(); if(!txt){$('#impText').focus();toast('Scrivi che cosa farai');return}
+    const list=store.get('diario',[]); list.unshift({id:Date.now(),p:g.p.n,code:g.s.code,mode:g.mode,txt,due:$('#impDate').value,done:false,note:''}); store.set('diario',list);
+    toast('Salvato nel diario'); location.hash='#diario';
+  };
+  $('#again').onclick=()=>{$('#play').hidden=true;$('#setup').hidden=false;renderSetup()};
+}
+function showBig(cls,face){
+  const o=document.createElement('div'); o.className='overlay'; o.setAttribute('role','dialog'); o.setAttribute('aria-label','Carta a schermo intero');
+  o.innerHTML=`<div class="cardwrap ${cls}"><div class="flip" style="transform:none">${face}</div></div><button class="btn" type="button">Chiudi</button>`;
+  o.addEventListener('click',e=>{if(e.target===o||e.target.closest('button'))o.remove()});
+  document.body.appendChild(o); o.querySelector('button').focus();
+}
+
+/* ---------- MAZZO ---------- */
+const dk={fam:'P',amb:'ALL',t:'E'};
+function renderDeck(){
+  $$('#v-mazzo .seg .opt').forEach(b=>b.setAttribute('aria-pressed',b.dataset.fam===dk.fam));
+  $('#deckChips').innerHTML=[['ALL','Tutti','var(--ink)'],...Object.entries(AMB).map(([k,v])=>[k,v.name,v.c]),...(dk.fam==='S'?[['J','Jolly','var(--lime)']]:[])].map(([k,n,c])=>`<button class="chip" type="button" data-a="${k}" aria-pressed="${dk.amb===k}"><span class="dot" style="background:${c}"></span>${n}</button>`).join('');
+  $('#deckSfType').hidden=dk.fam!=='S';
+  $$('#deckSfType .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===dk.t));
+  if(dk.fam==='P'){
+    const ps=P.filter(p=>dk.amb==='ALL'||p.a===dk.amb);
+    $('#deck').innerHTML=`<div class="grid">${ps.map(p=>`<button class="thumb" type="button" data-n="${p.n}" aria-label="Apri carta ${p.n}, ${esc(p.abil)}"><img src="${p.img}" alt="" loading="lazy"></button>`).join('')}</div>`;
+  } else {
+    const ss=SF.filter(s=>s.t===dk.t&&(dk.amb==='ALL'||s.a===dk.amb));
+    $('#deck').innerHTML=`<div class="list">${ss.map(s=>`<button class="item" type="button" data-code="${s.code}" data-t="${s.t}" style="text-align:left;width:100%"><span class="code" style="color:${s.a==='J'?'var(--ink)':AMB[s.a].c}">${s.code}</span><p>${esc(s.tx)}</p></button>`).join('')}</div>`;
+  }
+}
+$('#v-mazzo').addEventListener('click',e=>{
+  const o=e.target.closest('.seg .opt'); if(o){dk.fam=o.dataset.fam;if(dk.fam==='P'&&dk.amb==='J')dk.amb='ALL';renderDeck();return}
+  const c=e.target.closest('#deckChips .chip'); if(c){dk.amb=c.dataset.a;renderDeck();return}
+  const t=e.target.closest('#deckSfType .chip'); if(t){dk.t=t.dataset.t;renderDeck();return}
+  const th=e.target.closest('.thumb'); if(th){const p=P.find(x=>x.n==th.dataset.n);showBig('',`<div class="face"><img src="${p.img}" alt="Carta ${p.n}: ${esc(p.abil)}, ${esc(p.name)}"></div>`);return}
+  const it=e.target.closest('#deck .item'); if(it){const s=SF.find(x=>x.code===it.dataset.code&&x.t===it.dataset.t);showBig('sfida',`<div class="face">${sfidaHTML(s)}</div>`)}
+});
+
+/* ---------- CE L'HO ---------- */
+let ab=store.get('celho',{ho:[],manca:[]});
+function renderAbil(){
+  $('#abil').innerHTML=P.map(p=>{const s=ab.ho.includes(p.n)?'ho':ab.manca.includes(p.n)?'manca':'';return `<button class="ab" type="button" data-n="${p.n}" data-s="${s}" aria-label="${esc(p.abil)}${s==='ho'?', ce l’ho':s==='manca'?', mi manca':''}"><span class="dot" style="background:${AMB[p.a].c}"></span>${esc(p.abil)}</button>`}).join('');
+  const li=arr=>arr.length?arr.map(n=>`<li>${esc(P[n-1].abil)}</li>`).join(''):'<li style="list-style:none;margin-left:-20px;color:var(--muted);font-weight:400">Nessuna ancora</li>';
+  $('#listHo').innerHTML=li(ab.ho); $('#listManca').innerHTML=li(ab.manca);
+}
+$('#abil').addEventListener('click',e=>{
+  const b=e.target.closest('.ab'); if(!b)return; const n=+b.dataset.n;
+  if(ab.ho.includes(n)){ab.ho=ab.ho.filter(x=>x!==n); if(ab.manca.length>=5){toast('Hai già cinque abilità che ti mancano')} else ab.manca.push(n)}
+  else if(ab.manca.includes(n)){ab.manca=ab.manca.filter(x=>x!==n)}
+  else{ if(ab.ho.length>=5){toast('Hai già cinque abilità che senti di avere')} else ab.ho.push(n)}
+  store.set('celho',ab); renderAbil();
+});
+$('#resetAbil').onclick=()=>{ab={ho:[],manca:[]};store.set('celho',ab);renderAbil()};
+
+/* ---------- DIARIO ---------- */
+function renderDiary(){
+  const list=store.get('diario',[]);
+  if(!list.length){$('#diary').innerHTML=`<div class="empty"><p>Il diario è vuoto.</p><p>Gioca una partita e salva la sfida che vuoi provare: la ritrovi qui.</p></div><a class="btn" href="#gioca" style="text-decoration:none">Vai a Gioca</a>`;return}
+  $('#diary').innerHTML=list.map(it=>{const p=P[it.p-1];const due=it.due?new Date(it.due+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'long'}):'';
+    return `<div class="entry ${it.done?'done':''}" data-id="${it.id}">
+      <div class="meta"><span style="color:${AMB[p.a].c}">${esc(p.abil)} · ${it.code}</span><span>${due?'entro il '+due:''}</span></div>
+      <p><b>${esc(it.txt)}</b></p>
+      <label for="n${it.id}" style="font-size:12px;color:var(--muted)">Com’è andata</label>
+      <textarea id="n${it.id}" data-note="${it.id}" style="min-height:64px" placeholder="Annota sorprese, ostacoli, che cosa hai imparato.">${esc(it.note||'')}</textarea>
+      <div class="row"><button class="btn small ${it.done?'ghost':''}" type="button" data-done="${it.id}">${it.done?'Riapri':'Fatto'}</button><button class="btn ghost small" type="button" data-del="${it.id}">Elimina</button></div>
+    </div>`}).join('');
+}
+$('#diary').addEventListener('click',e=>{
+  const list=store.get('diario',[]);
+  const d=e.target.closest('[data-done]'); if(d){const it=list.find(x=>x.id==d.dataset.done);it.done=!it.done;store.set('diario',list);renderDiary();return}
+  const x=e.target.closest('[data-del]'); if(x){
+    if(x.dataset.confirm){store.set('diario',list.filter(i=>i.id!=x.dataset.del));renderDiary();toast('Eliminata')}
+    else{x.dataset.confirm='1';x.textContent='Conferma';setTimeout(()=>{if(x.isConnected){delete x.dataset.confirm;x.textContent='Elimina'}},3000)}
+  }
+});
+$('#diary').addEventListener('input',e=>{const t=e.target.closest('[data-note]');if(!t)return;const list=store.get('diario',[]);const it=list.find(x=>x.id==t.dataset.note);if(it){it.note=t.value;store.set('diario',list)}});
+
+/* ---------- REGOLE ---------- */
+$('#ambitList').innerHTML=Object.entries(AMB).map(([k,v])=>`<div class="item"><span style="display:flex;align-items:center">${icon(k,v.hex)}</span><p><b style="color:${v.c}">${v.name}</b><br>${v.what}</p></div>`).join('');
+
+/* ---------- ROUTER ---------- */
+const VIEWS=['gioca','mazzo','celho','diario','regole'];
+function route(){
+  const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'gioca';
+  VIEWS.forEach(x=>$('#v-'+x).hidden=x!==v);
+  $$('nav.tabs a').forEach(a=>a.toggleAttribute('aria-current',false)||a.dataset.v===v&&a.setAttribute('aria-current','page'));
+  if(v==='mazzo')renderDeck(); if(v==='celho')renderAbil(); if(v==='diario')renderDiary(); if(v==='gioca'&&$('#play').hidden)renderSetup();
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',route);
+renderSetup(); route();
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+</script>
+</body>
+</html>
